@@ -1,0 +1,5 @@
+com\upai\smartneib\SmartNeibApplication.class
+com\upai\smartneib\user\Result.class
+com\upai\smartneib\user\UserRepository.class
+com\upai\smartneib\user\UserController.class
+com\upai\smartneib\user\User.class

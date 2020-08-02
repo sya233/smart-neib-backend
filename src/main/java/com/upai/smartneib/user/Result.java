@@ -1,4 +1,4 @@
-package com.upai.smartneib.register;
+package com.upai.smartneib.user;
 
 public class Result {
 
