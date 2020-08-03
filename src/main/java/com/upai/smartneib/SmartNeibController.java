@@ -1,5 +1,11 @@
-package com.upai.smartneib.user;
+package com.upai.smartneib;
 
+import com.upai.smartneib.update.Apk;
+import com.upai.smartneib.update.ApkResult;
+import com.upai.smartneib.update.UpdateRepository;
+import com.upai.smartneib.user.Result;
+import com.upai.smartneib.user.User;
+import com.upai.smartneib.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -7,14 +13,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 @RequestMapping(path = "/smart-neib")
-public class UserController {
+public class SmartNeibController {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UpdateRepository updateRepository;
 
     /**
      * 用户注册
@@ -64,6 +71,32 @@ public class UserController {
             result = "用户名不存在!";
         }
         return new Result(username, result);
+    }
+
+    /**
+     * 更新APK
+     *
+     * @param currentVersion 当前版本号
+     * @return 返回结果
+     */
+    @PostMapping(path = "/update")
+    public @ResponseBody
+    ApkResult update(@RequestParam String currentVersion) {
+        List<Apk> updateApkList = updateRepository.findAll();
+        String newVersion = currentVersion;
+        String url = "";
+        String result = "";
+        if (updateApkList.size() == 1) {
+            Apk apk = updateApkList.get(0);
+            if (Float.parseFloat(apk.getVersion()) > Float.parseFloat(currentVersion)) {
+                newVersion = apk.getVersion();
+                url = apk.getUrl();
+                result = "有新版本可升级, 当前版本号为: " + currentVersion + "; 最新版本号为: " + newVersion;
+            } else {
+                result = "当前版本为最新版本";
+            }
+        }
+        return new ApkResult(newVersion, url, result);
     }
 
 }
