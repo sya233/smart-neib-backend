@@ -1,5 +1,11 @@
 C:\Users\wei\MyLife\MyProject\IDEA\smart-neib-backend\src\main\java\com\upai\smartneib\SmartNeibApplication.java
 C:\Users\wei\MyLife\MyProject\IDEA\smart-neib-backend\src\main\java\com\upai\smartneib\user\Result.java
-C:\Users\wei\MyLife\MyProject\IDEA\smart-neib-backend\src\main\java\com\upai\smartneib\user\UserController.java
+C:\Users\wei\MyLife\MyProject\IDEA\smart-neib-backend\src\main\java\com\upai\smartneib\notification\NotificationResult.java
+C:\Users\wei\MyLife\MyProject\IDEA\smart-neib-backend\src\main\java\com\upai\smartneib\update\UpdateRepository.java
+C:\Users\wei\MyLife\MyProject\IDEA\smart-neib-backend\src\main\java\com\upai\smartneib\SmartNeibController.java
+C:\Users\wei\MyLife\MyProject\IDEA\smart-neib-backend\src\main\java\com\upai\smartneib\update\Apk.java
 C:\Users\wei\MyLife\MyProject\IDEA\smart-neib-backend\src\main\java\com\upai\smartneib\user\User.java
+C:\Users\wei\MyLife\MyProject\IDEA\smart-neib-backend\src\main\java\com\upai\smartneib\notification\Notification.java
+C:\Users\wei\MyLife\MyProject\IDEA\smart-neib-backend\src\main\java\com\upai\smartneib\notification\NotificationRepository.java
+C:\Users\wei\MyLife\MyProject\IDEA\smart-neib-backend\src\main\java\com\upai\smartneib\update\ApkResult.java
 C:\Users\wei\MyLife\MyProject\IDEA\smart-neib-backend\src\main\java\com\upai\smartneib\user\UserRepository.java

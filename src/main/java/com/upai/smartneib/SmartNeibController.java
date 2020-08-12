@@ -1,5 +1,8 @@
 package com.upai.smartneib;
 
+import com.upai.smartneib.notification.Notification;
+import com.upai.smartneib.notification.NotificationRepository;
+import com.upai.smartneib.notification.NotificationResult;
 import com.upai.smartneib.update.Apk;
 import com.upai.smartneib.update.ApkResult;
 import com.upai.smartneib.update.UpdateRepository;
@@ -22,6 +25,8 @@ public class SmartNeibController {
     private UserRepository userRepository;
     @Autowired
     private UpdateRepository updateRepository;
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     /**
      * 用户注册
@@ -97,6 +102,24 @@ public class SmartNeibController {
             }
         }
         return new ApkResult(newVersion, url, result);
+    }
+
+    /**
+     * 获取全部通知
+     *
+     * @return 返回结果
+     */
+    @PostMapping(path = "/notification")
+    public @ResponseBody
+    NotificationResult notification() {
+        List<Notification> notificationList = notificationRepository.findAll();
+        String result = "";
+        if (notificationList == null) {
+            result = "获取失败";
+        } else {
+            result = "获取成功";
+        }
+        return new NotificationResult(result, notificationList);
     }
 
 }
