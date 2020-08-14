@@ -1,7 +1,10 @@
 com\upai\smartneib\notification\Notification.class
-com\upai\smartneib\notification\NotificationResult.class
+com\upai\smartneib\repair\Repair.class
+com\upai\smartneib\repair\RepairResult.class
 com\upai\smartneib\SmartNeibApplication.class
+com\upai\smartneib\repair\RepairRepository.class
+com\upai\smartneib\user\User.class
+com\upai\smartneib\notification\NotificationResult.class
 com\upai\smartneib\user\Result.class
 com\upai\smartneib\user\UserRepository.class
 com\upai\smartneib\notification\NotificationRepository.class
-com\upai\smartneib\user\User.class

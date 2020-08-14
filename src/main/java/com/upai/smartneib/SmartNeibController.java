@@ -3,6 +3,9 @@ package com.upai.smartneib;
 import com.upai.smartneib.notification.Notification;
 import com.upai.smartneib.notification.NotificationRepository;
 import com.upai.smartneib.notification.NotificationResult;
+import com.upai.smartneib.repair.Repair;
+import com.upai.smartneib.repair.RepairRepository;
+import com.upai.smartneib.repair.RepairResult;
 import com.upai.smartneib.update.Apk;
 import com.upai.smartneib.update.ApkResult;
 import com.upai.smartneib.update.UpdateRepository;
@@ -27,6 +30,8 @@ public class SmartNeibController {
     private UpdateRepository updateRepository;
     @Autowired
     private NotificationRepository notificationRepository;
+    @Autowired
+    private RepairRepository repairRepository;
 
     /**
      * 用户注册
@@ -120,6 +125,32 @@ public class SmartNeibController {
             result = "获取成功";
         }
         return new NotificationResult(result, notificationList);
+    }
+
+    /**
+     * 用户报修接口
+     *
+     * @param id      主键
+     * @param user    用户名
+     * @param name    姓名
+     * @param phone   电话号码
+     * @param address 地址
+     * @param content 报修详情
+     * @return 报修结果
+     */
+    @PostMapping(path = "/repair")
+    public @ResponseBody
+    RepairResult repair(@RequestParam String id, @RequestParam String user, @RequestParam String name,
+                        @RequestParam String phone, @RequestParam String address, @RequestParam String content) {
+        Repair repair = new Repair();
+        repair.setId(id);
+        repair.setUser(user);
+        repair.setName(name);
+        repair.setPhone(phone);
+        repair.setAddress(address);
+        repair.setContent(content);
+        repairRepository.save(repair);
+        return new RepairResult(user, name, "报修成功");
     }
 
 }
