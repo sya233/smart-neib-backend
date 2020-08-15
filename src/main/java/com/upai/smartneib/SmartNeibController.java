@@ -1,5 +1,14 @@
 package com.upai.smartneib;
 
+import com.alipay.api.AlipayApiException;
+import com.alipay.api.AlipayClient;
+import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.domain.AlipayTradeAppPayModel;
+import com.alipay.api.request.AlipayTradeAppPayRequest;
+import com.alipay.api.response.AlipayTradeAppPayResponse;
+import com.upai.smartneib.alipay.AliOrderRepository;
+import com.upai.smartneib.alipay.AliOrderResult;
+import com.upai.smartneib.alipay.Aliorder;
 import com.upai.smartneib.notification.Notification;
 import com.upai.smartneib.notification.NotificationRepository;
 import com.upai.smartneib.notification.NotificationResult;
@@ -32,6 +41,8 @@ public class SmartNeibController {
     private NotificationRepository notificationRepository;
     @Autowired
     private RepairRepository repairRepository;
+    @Autowired
+    private AliOrderRepository aliOrderRepository;
 
     /**
      * 用户注册
@@ -118,7 +129,7 @@ public class SmartNeibController {
     public @ResponseBody
     NotificationResult notification() {
         List<Notification> notificationList = notificationRepository.findAll();
-        String result = "";
+        String result;
         if (notificationList == null) {
             result = "获取失败";
         } else {
@@ -151,6 +162,59 @@ public class SmartNeibController {
         repair.setContent(content);
         repairRepository.save(repair);
         return new RepairResult(user, name, "报修成功");
+    }
+
+    /**
+     * 获取订单列表
+     *
+     * @param user 用户名
+     * @return 返回结果
+     */
+    @PostMapping(path = "/order")
+    public @ResponseBody
+    AliOrderResult orderList(@RequestParam String user) {
+        List<Aliorder> aliorders = aliOrderRepository.findOrderByUser(user);
+        String result;
+        if (aliorders != null) {
+            result = "success";
+        } else {
+            result = "fail";
+        }
+        return new AliOrderResult(aliorders, result);
+    }
+
+    /**
+     * 支付宝订单
+     *
+     * @param des    订单描述
+     * @param id     id
+     * @param amount 金额
+     * @return 返回结果
+     */
+    @PostMapping(path = "/pay")
+    public @ResponseBody
+    String aliPayOrder(@RequestParam String des, @RequestParam String id, @RequestParam String amount) {
+        String json = "";
+        final String APP_ID = "2016102400752776";
+        final String APP_PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwHpJSrGwd1lNXg+smOwHttMzFWBor/k53PEdLS2llqslF9mGMZYZWMoiYJcxHEeHJ5C8SYxypa8X7h2YOYXUrnMmFtFsuDqZAcdF82SL5zV+fMN7d+3GqebKAtRpBWO3KxuzgEkeVaV8j/rz3b5jNwOhpkvhLJd3pFEV+BrxBxYe8OfSPB6G/dopGw0ihx/zl6tYBcurRbwmVbFzGsYF9j770eiT5e/YgGCDA33E6llUsGNuRkv2s9ZMg0iwUk/NpRD3ArtLUA1OSQJ0aOhR/Yag8KpeTxkvENZ5/bnZn95Mq6WxdGWyVzyHYmyiOEh9xEz5un7EV1ecH/zPNjqStQIDAQAB";
+        final String APP_PRIVATE_KEY = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCV9xoN1166o+e6/3yuy3V6q5jQuT/iGyAA0hgBy2xyW6FF0y8ycWYYGjsqEM2RbGEW8kbdGTDSvqObx1eTSOdu35JMAczYoxfFRhD5pmZi5zxA5bBVr408qseBsVXnWaxnQ+CX/ILmoqY9IEfvatuN46JOUcj7dNhCWNUVXpheW4Z7SsUAT0cyzEnFOIW/d5YfKk5SsaCBM+4IuSu05YmDLCg+525t1ue7Krc6mMQEPdxjhP5FZ0L20LjEY7HjP2q3OMY2cpgoMwN+k6YkX0InsMV+Uxg4An0h5L19J0qulQCOYudRUoRh2xrk4MZq9H2qpRr19RKAskYOI2Bm5WlVAgMBAAECggEAB2u521N7+Ypgzi0UU2X4A0D4h+OS2LJ06/V5gKU7UZFdMqJXpIxd+/VYViWMtpSBXWxRu2EivFr4p52+pKgn46GmkKJKK7IuW/Gyp1fnmx9MKP30stjECWt+AdnvoUobsOR3+a1iIN2NklrFlIBaKvRHtM5xPpgyl13j9XG/4nNbmPDDxbkYT+73rxKFa9ro0P5EAVwbM9DXnVFMn1VYzmfds15TsEX/gMPeompIEDadGurYK6mRUrjKTLH0Tcbp6bUA51X+8O3cBhMn5XEV7cO0IBsklgImYHx0PtuDaB3Dl/Ve5NnHygy4ns0UlAlqAuVamJfenrNPYd4ZAlaPZQKBgQDFBpVc8bCpwIkT5iQfcQRiElb4mDU24olU7MFYGlRbnnleHr4VrKFlwzMqQPjQCYDbSkNWOLEguqMTL1gZixClYOrc29bBZ4TU//Q9mC4L+GS160GRy67u/KcaaKsYUR7676ZWkTZvK/ZpSc9aOtxJ9b0rnwBblyLB8j7DgYm4XwKBgQDC2m7HTFxNovIrhvegdHj958vqKfB84xpryRayUgY8M208VQxzT1MMcl9TAt4KW/AhvNKU/Dvbo/l3XUtMlYBW7lkSnMSMtqu8/DNr+UmnUQh/XhQ7vBNtGUFeTKFG/1oZsUpF5ga3/yXsdARJ60KWrAk1XOslYd6bTZY8ZdOKywKBgCySYrPWEWs1nU0dIUrjnGQ7VeWDOXajJQJLVSoDOtZHMZmzRrlMhm6pDCgg7qjRnY7+a+FTje6jikTKzxloNmnTVQ6FxT2Xl5tAFBbjGHeox8/H2tuKwpZaHcuBpkMoBuQp1u16iF/6CBKlmf0Fl9Q7fYIixEf0Fu7dSImeAnPtAoGAY/MJ2f9IZaaM1FkCEnNMUOmixrXGnzkbJ2jZ1JSQkDbM9KKnpUpuTjcowHr7DJNGZPfniPateaft4hWf92PEllLiq9JwW8Gj7GfttJgF+OZvFm5asJ1z1YWb61Qhcjqvq/guIhaxIZamjFiijow39vO+MXo9QEqolj9BLjAJR+sCgYEAhu326rUvlRmGgvv2KGBH8cHAulWWuoHyDM2No2slV/MKSGb+2u6s3jvWtq7GWcU/PYwQnSHlnuS+J5CJNjNLK1ZELH4jp8Evg2sgUv491dALemQ/Rok9P0xGJYrGyUJB+3O2QGqHFMebPv/+X8n2G0r4t2J+Q/CqabvwbDeR0LU=";
+        AlipayClient alipayClient = new DefaultAlipayClient("https://openapi.alipaydev.com/gateway.do",
+                APP_ID, APP_PRIVATE_KEY, "json", "UTF-8", APP_PUBLIC_KEY, "RSA2");
+        AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
+        AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
+        model.setSubject(des);
+        model.setOutTradeNo(id);
+        model.setTimeoutExpress("30m");
+        model.setTotalAmount(amount);
+        model.setProductCode("QUICK_MSECURITY_PAY");
+        request.setBizModel(model);
+        try {
+            AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
+            json = response.getBody();
+        } catch (AlipayApiException e) {
+            e.printStackTrace();
+        }
+        return json;
     }
 
 }
